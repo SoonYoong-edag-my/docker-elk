@@ -67,6 +67,7 @@ services:
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+      - logstash:/mnt/last_run
     ports:
       - 5044:5044
       - 50000:50000/tcp
@@ -98,6 +99,21 @@ services:
       - elasticsearch
     restart: unless-stopped
 
+  rpt-postgresql:
+    image: postgres:13.4
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=rpt
+      - POSTGRES_PASSWORD=rpt
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    # If you want to expose these ports outside your dev PC,
+    # remove the "127.0.0.1:" prefix
+    ports:
+      - 5433:5432
+    networks:
+      - elk
+
 networks:
   elk:
     driver: bridge
@@ -105,3 +121,5 @@ networks:
 volumes:
   setup:
   elasticsearch:
+  postgres:
+  logstash:
